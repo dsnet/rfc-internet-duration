@@ -168,7 +168,9 @@ The second and minute values must adhere to carry-over points.
 The grammar represents a bijective mapping for any finite duration value.</t>
 
 <t>Parsing implementations SHOULD reject an overly large or negative duration if the value cannot be adequately represented.
-Parsing implementations SHOULD accept an overly precise duration by truncating towards zero or rounding to the nearest representable value.</t>
+Parsing implementations SHOULD accept an overly precise duration by truncating towards zero or rounding to the nearest representable value.
+If any parsing limitations are present, an implementation SHOULD document them.
+</t>
 </section>
 <section anchor="valid-examples" title="Valid Examples">
 
@@ -273,6 +275,16 @@ Note that hour values never overflow over to days.</t>
 rather than each individual value within the duration.
 This example must instead be expressed as -PT1H2M3S</t>
 </section>
+</section>
+
+
+<section anchor="security-considerations" title="Security Considerations">
+
+<t>When parsing, adding up each unit value may result in numeric overflow.
+For example, if an implementation represents a duration as a signed 64-bit integer of nanoseconds,
+then parsing PT2562047H47M16S.854775808 should report an error since this would otherwise overflow to a very large negative duration.
+Such bugs could conceivably be used to circumvent permission checks based on time.</t>
+
 </section>
 
 </middle>
