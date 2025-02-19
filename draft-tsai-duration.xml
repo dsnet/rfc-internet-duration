@@ -74,7 +74,7 @@ For example, PT1H (1 hour) is more readable than PT3600S (3600 seconds).</t>
 <t>Precise durations are essential for many Internet protocols.
 As such, this document makes use of a rule in ISO 8601 that permits the "lowest order component" to have a decimal fraction, which we can use for seconds.</t>
 
-<t>Negative durations are essential for many Internet protocols.
+<t>Negative durations are essential for many applications.
 While the basic rules of ISO 8601 only define a positive duration, the extended rules permit a negative duration by prepending a minus sign.</t>
 
 <t>By mutual agreement of communicating partners, there are other optional representations of a duration according to ISO 8601.
@@ -88,11 +88,11 @@ For example <xref target="RFC8785"/> defines a canonical representation of JSON 
 Most formats are not inherently canonical because the flexibility in representation is a more useful property.</t>
 
 <t>If there is insufficient utility to alternative representations then it is sensible to constrain the grammar so that it is canonical by construction.
-This would avoid the need for a separate document to define a canonical representation for a duration.
-A canonical representation implies that the grammar is bijective; for every finite duration value there would be exactly one representation in the format.
-This also provides the utility that formatted durations can be compared byte-for-byte as a means to check if the duration values are equal.</t>
+The syntax specified in this document is thus constrained and is therefore canonical.</t>
+<t>A canonical representation implies that the grammar is bijective; for every finite duration value there would be exactly one representation.
+This also has the effect that formatted durations can be compared byte-for-byte as a means to check if the duration values are equal.</t>
 
-<t>Given the constraints mentioned above, (i.e., supporting only hour, minute, and second units), there are several reasonable ways for alternative, but equivalent representation that is still compliant with ISO 8601.</t>
+<t>Given the constraints mentioned above, (i.e., supporting only hour, minute, and second units), being canonical requires several further restrictions against practices allowed by ISO 8601.</t>
 
 <section anchor="zero-values" title="Zero Value Units">
 
@@ -112,7 +112,7 @@ However, the grammar for an ISO 8601 duration is inherently already a variable-l
 
 <section anchor="overflow" title="Overflow of Minute and Second Units">
 
-<t>Normally, PT60S (60 seconds) carries over and is instead formatted as PT1M.
+<t>Normally, PT60S (60 seconds) "overflows" and is instead formatted as PT1M.
 However, PT60S is valid according to ISO 8601.
 One benefit of permitting overflow of units is for simple implementations of formatters that generate a duration using only second units (e.g., PT123456.789S).</t>
 <t>However, older revisions of ISO 8601 specified that implementations may require that values must not exceed "carry-over points".
@@ -157,10 +157,10 @@ duration    = ( [ minus ] P dur-time ) / dur-zero
 <t>The grammar for a duration is a strict subset of ISO 8601.
 Only uppercase designator characters ("P", "T", etc.) are permitted.
 Only a period (".") is permitted as the decimal sign to separate a fraction.
-The second and minute values must adhere to carry-over points.
+The second and minute values must not overflow past 59.
 The grammar represents a bijective mapping for any finite duration value.</t>
 
-<t>Implementations SHOULD reject an overly large or negative durations if the value cannot be adequately represented.
+<t>Implementations SHOULD reject overly large positive or negative durations if the value cannot be adequately represented.
 Implementations SHOULD accept an overly precise duration by truncating towards zero or rounding to the nearest representable value.
 If any such limitations are present, an implementation SHOULD document them.
 </t>
@@ -273,9 +273,9 @@ This example must instead be expressed as -PT1H2M3S</t>
 
 <section anchor="security-considerations" title="Security Considerations">
 
-<t>When parsing, summing the unit value may result in numeric overflow.
-For example, if an implementation represents a duration as a signed 64-bit integer of nanoseconds,
-then parsing PT2562047H47M16S.854775808 should report an error since this would otherwise overflow to a very large negative duration.
+<t>When parsing, summing the hour/minute/second unit values may result in numeric overflow.
+For example, if an implementation internally represents a duration as a signed 64-bit integer of nanoseconds,
+then parsing PT2562047H47M16S.854775808 should report an error, since this would otherwise overflow to a very large negative duration.
 Such bugs could conceivably be used to circumvent permission checks based on time.</t>
 
 </section>
