@@ -51,7 +51,8 @@ Some handle a subset of ISO 8601, while others extend ISO 8601 in non-standard w
 
 <section anchor="design-issues" title="Design Issues">
 <section anchor="accuracy" title="Accuracy">
-<t>ISO 8601 permits the use of year, month, week, and day units in representing a duration, but none of these can be reliably converted to a fixed duration value without further context. Years vary in length depending on leap years and seconds, months by definition, and days depending on leap seconds.</t>
+<t>ISO 8601 permits the use of year, month, week, and day units in representing a duration, but none of these can be reliably converted to a fixed duration value without further context. Years, months, and days vary in length depending on leap years and/or leap seconds.</t>
+
 <t>In contrast, a second is defined in terms of the frequency of the vibration of a caesium 133 atom, a minute as exactly 60 seconds, and an hour as exactly 60 minutes.</t>
 <t>For interoperability and to prioritize accuracy, this document requires that durations be specified only in terms of hours, minutes, and seconds.</t>
 </section>
@@ -119,7 +120,7 @@ Thus, implementations may exist that reject PT60S or PT60M because they expect P
 
 <t>Rejecting overflow of minute and second units seems to provide the greatest degree of forwards compatibility with existing parsers that accept ISO 8601, and provides greater readability.</t>
 
-<t>Given the arguably low utility of alternative representations, disallowing them allows the timestamp representation specified by this document to be canonical.</t>
+<t>Given the arguably low utility of alternative representations, disallowing them allows the duration representation specified by this document to be canonical.</t>
 
 </section>
 </section>
@@ -245,7 +246,7 @@ This example must instead be expressed as PT0.123S.</t>
 <sourcecode>PT1.S
 PT1.000S</sourcecode>
 
-<t>A decimal point with no fractional digits is invalid.
+<t>A decimal point with no fractional digits is invalid, as are trailing zeroes in fractional digits.
 These examples must instead be expressed as PT1S.</t>
 
 <sourcecode>PT0.025H
