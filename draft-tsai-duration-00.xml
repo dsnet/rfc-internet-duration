@@ -33,15 +33,13 @@ version="3">
 
 <section anchor="intro" title="Introduction">
 
-<t>This document specifies an Internet profile of the ISO 8601 [ISO8601] standard for representation of durations.</t>
+<t>This document specifies an Internet profile of the ISO 8601 <xref target="ISO8601"/> standard for representation of durations.</t>
 
 <t>There are many ways that durations might appear in Internet protocols, not all of which can accurately represent an exact duration value.
 Many implementations disagree about the exact grammar for a duration.
 Some handle a subset of ISO 8601, while others extend ISO 8601 in non-standard ways.</t>
 
-<t>This document serves as a similar purpose as <xref target="RFC3339"/>.
-The former defines a particular profile of ISO 8601 for timestamps.
-This document defines a particular profile of ISO 8601 for durations.</t>
+<t><xref target="RFC3339"/> specifies a subset of 8601 for representing timetamps; this document does the same for durations.</t>
 
 <section anchor="notation" title="Notation">
 <t>The duration representation is specified using ABNF <xref target="RFC5234"/>.</t>
@@ -53,21 +51,17 @@ This document defines a particular profile of ISO 8601 for durations.</t>
 
 <section anchor="design-issues" title="Design Issues">
 <section anchor="accuracy" title="Accuracy">
-<t>ISO 8601 permits the use of year, month, week, and day units to represent a duration, but does not define a context independent way to convert such larger units to smaller units such as hour, minute, and second.</t>
-<t>A minute is defined as being 60 seconds long. An hour is defined as being 60 minutes long. In contrast, a day is nominally 24 hours long, but subject to the insertion and removal of leap seconds, and the insertion and removal of intervals by local authorities.
-Consequently, the length of a day is context dependent and therefore unsuitable for an accurate representation of a duration.
-Similarly, the length of a year, month, or week is dependent on context such as what timestamp and what jurisdiction the duration is relative to.
-For example, 1 year starting relative to January 1st, 2000 is 366 days long, while 1 year starting relative to January 1st, 2001 is 365 days long, due to the existence of leap years.</t>
-<t>For interoperability, accuracy is prioritized and allowing year, month, week, and day units would violate this property.
-A formatted duration must be able to represent an exact duration in a context independent manner.</t>
+<t>ISO 8601 permits the use of year, month, week, and day units in representing a duration, but none of these can be reliably converted to a fixed duration value without further context. Years, months, and days vary in length depending on leap years and/or leap seconds.</t>
 
+<t>In contrast, a second is defined in terms of the frequency of the vibration of a caesium 133 atom, a minute as exactly 60 seconds, and an hour as exactly 60 minutes.</t>
+<t>For interoperability and to prioritize accuracy, this document requires that durations be specified only in terms of hours, minutes, and seconds.</t>
 </section>
 
 <section anchor="readibility" title="Readability">
-<t>Human readability is a valuable feature of Internet protocols.</t>
+<t>Human readability is a valuable feature in Internet protocols.</t>
 <t>The complete representation of a duration according to ISO 8601 would be fairly verbose if the year, month, and day elements were always present, given that they cannot be used.</t>
-<t>As such, the format makes use of a rule in ISO 8601 that permits the element to be absent if it is zero. For example, P0Y0M0DT0H0M1S (the complete representation for 1 second) can be more concisely written as just PT1S.</t>
-<t>Accuracy is a higher priority over readability.
+<t>As such, this document makes use of a rule in ISO 8601 that permits the element to be absent if it is zero. For example, P0Y0M0DT0H0M1S (the complete representation for 1 second) can be more concisely written as just PT1S.</t>
+<t>Accuracy has higher priority than readability.
 For example, while P123D (123 days) is more readable than PT2952H (2952 hours), the ambiguity regarding the exact duration of a day is problematic.
 </t>
 
@@ -78,7 +72,7 @@ For example, PT1H (1 hour) is more readable than PT3600S (3600 seconds).</t>
 
 <section anchor="extensions" title="Extensions and Options">
 <t>Precise durations are essential for many Internet protocols.
-As such, the format makes use of a rule in ISO 8601 that permits the "lowest order component" to have a decimal fraction, which we can use for the second units.</t>
+As such, this document makes use of a rule in ISO 8601 that permits the "lowest order component" to have a decimal fraction, which we can use for seconds.</t>
 
 <t>Negative durations are essential for many Internet protocols.
 While the basic rules of ISO 8601 only define a positive duration, the extended rules permit a negative duration by prepending a minus sign.</t>
@@ -93,31 +87,30 @@ Permitting these optional features would violate that goal.</t>
 For example <xref target="RFC8785"/> defines a canonical representation of JSON (<xref target="RFC8259"/>).
 Most formats are not inherently canonical because the flexibility in representation is a more useful property.</t>
 
-<t>If there is insufficient utility to alternative representations, then it is sensible to constrain the grammar, so that it is canonical by construction.
+<t>If there is insufficient utility to alternative representations then it is sensible to constrain the grammar so that it is canonical by construction.
 This would avoid the need for a separate document to define a canonical representation for a duration.
 A canonical representation implies that the grammar is bijective; for every finite duration value there would be exactly one representation in the format.
 This also provides the utility that formatted durations can be compared byte-for-byte as a means to check if the duration values are equal.</t>
 
 <t>Given the constraints mentioned above, (i.e., supporting only hour, minute, and second units), there are several reasonable ways for alternative, but equivalent representation that is still compliant with ISO 8601.</t>
 
-<section anchor="zero-values" title="Allow Zero Value Units">
+<section anchor="zero-values" title="Zero Value Units">
 
 <t>ISO 8601 does not require that zero value units always be absent.
 For example, PT0H0M0S is valid.
 However, permitting unnecessary duration elements hinders readability for little to no utility.
-This could be simpler written as PT0S.</t>
+This could be more simply written as PT0S.</t>
 </section>
 
-<section anchor="trailing-zeroes" title="Allow Trailing Zeros in Decimal Fractions">
-<t>ISO 8601 permits fractional numbers with trailing zeros.
-For example, PT1.000S is valid.</t>
+<section anchor="trailing-zeroes" title="Trailing Zeros in Decimal Fractions">
+<t>ISO 8601 permits fractional numbers with trailing zeros, for example PT1.000S.</t>
 
 <t>Padding with trailing zeros is often used to improve readability to ensure that the generated format is always a fixed width.
 However, the grammar for an ISO 8601 duration is inherently already a variable-length format, so the utility of using trailing zeros for padding is of questionable value.</t>
 
 </section>
 
-<section anchor="overflow" title="Allow Overflow of Minute and Second Units">
+<section anchor="overflow" title="Overflow of Minute and Second Units">
 
 <t>Normally, PT60S (60 seconds) carries over and is instead formatted as PT1M.
 However, PT60S is valid according to ISO 8601.
@@ -125,9 +118,9 @@ One benefit of permitting overflow of units is for simple implementations of for
 <t>However, older revisions of ISO 8601 specified that implementations may require that values must not exceed "carry-over points".
 Thus, implementations may exist that reject PT60S or PT60M because they expect PT1M or PT1H instead.</t>
 
-<t>Rejecting overflow of minute and second units seem to provide the greatest degree of forwards compatibility with existing parsers that accept ISO 8601 and provides greater readability.</t>
+<t>Rejecting overflow of minute and second units seems to provide the greatest degree of forwards compatibility with existing parsers that accept ISO 8601, and provides greater readability.</t>
 
-<t>Given the arguably low utility of alternative representations, the ability for the format to be canonical is achievable.</t>
+<t>Given the arguably low utility of alternative representations, disallowing them allows the duration representation specified by this document to be canonical.</t>
 
 </section>
 </section>
@@ -162,14 +155,14 @@ duration    = ( [ minus ] P dur-time ) / dur-zero
 </sourcecode>
 
 <t>The grammar for a duration is a strict subset of ISO 8601.
-Only uppercase designator characters (e.g., 'P', 'T', etc.) are permitted.
-Only a period (e.g., '.') is permitted as the decimal sign to separate a fraction.
+Only uppercase designator characters ("P", "T", etc.) are permitted.
+Only a period (".") is permitted as the decimal sign to separate a fraction.
 The second and minute values must adhere to carry-over points.
 The grammar represents a bijective mapping for any finite duration value.</t>
 
-<t>Parsing implementations SHOULD reject an overly large or negative duration if the value cannot be adequately represented.
-Parsing implementations SHOULD accept an overly precise duration by truncating towards zero or rounding to the nearest representable value.
-If any parsing limitations are present, an implementation SHOULD document them.
+<t>Implementations SHOULD reject an overly large or negative durations if the value cannot be adequately represented.
+Implementations SHOULD accept an overly precise duration by truncating towards zero or rounding to the nearest representable value.
+If any such limitations are present, an implementation SHOULD document them.
 </t>
 </section>
 <section anchor="valid-examples" title="Valid Examples">
@@ -253,7 +246,7 @@ This example must instead be expressed as PT0.123S.</t>
 <sourcecode>PT1.S
 PT1.000S</sourcecode>
 
-<t>Unnecessary decimal sign or fractional digits must be absent.
+<t>A decimal point with no fractional digits is invalid, as are trailing zeroes in fractional digits.
 These examples must instead be expressed as PT1S.</t>
 
 <sourcecode>PT0.025H
@@ -280,7 +273,7 @@ This example must instead be expressed as -PT1H2M3S</t>
 
 <section anchor="security-considerations" title="Security Considerations">
 
-<t>When parsing, adding up each unit value may result in numeric overflow.
+<t>When parsing, summing the unit value may result in numeric overflow.
 For example, if an implementation represents a duration as a signed 64-bit integer of nanoseconds,
 then parsing PT2562047H47M16S.854775808 should report an error since this would otherwise overflow to a very large negative duration.
 Such bugs could conceivably be used to circumvent permission checks based on time.</t>
@@ -298,6 +291,12 @@ Such bugs could conceivably be used to circumvent permission checks based on tim
 <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
 <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8785.xml"/>
 <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8259.xml"/>
+<reference anchor="ISO8601" target="https://www.iso.org/standard/70907.html">
+<front>
+<title abbrev="ISO 8601-1:2019">ISO 8601-1:2019: Date and time — Representations for information interchange</title>
+<author><organization>International Standards Organization</organization><address /></author>
+</front>
+</reference>
 
 </references>
 
