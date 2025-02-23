@@ -253,7 +253,7 @@ These examples must instead be expressed as PT1S.</t>
 PT1.5M</sourcecode>
 
 <t>Fractional values are invalid for hour and minute designators.
-This example must instead be expressed as PT90S.</t>
+This example must instead be expressed as PT1M30S.</t>
 
 <sourcecode>PT3600S
 PT60M</sourcecode>
