@@ -146,7 +146,7 @@ period      = %x2E    ; .
 b60-int     = ( digit1-5 digit0-9 / digit1-9 ) ; 1-59
 pos-int     = digit1-9 *digit0-9
 dur-zero    = P T digit0 S
-dur-secfrac = period 0*digit0-9 digit1-9
+dur-secfrac = period *digit0-9 digit1-9
 dur-second  = ( b60-int [ dur-secfrac ] / digit0 dur-secfrac ) S
 dur-minute  = b60-int M [ dur-second ]
 dur-hour    = pos-int H [ ( dur-minute / dur-second ) ]
@@ -293,7 +293,7 @@ Such bugs could conceivably be used to circumvent permission checks based on tim
 <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8259.xml"/>
 <reference anchor="ISO8601" target="https://www.iso.org/standard/70907.html">
 <front>
-<title abbrev="ISO 8601-1:2019">ISO 8601-1:2019: Date and time — Representations for information interchange</title>
+<title abbrev="ISO 8601-1:2019">ISO 8601-1:2019: Date and time - Representations for information interchange</title>
 <author><organization>International Standards Organization</organization><address /></author>
 </front>
 </reference>
